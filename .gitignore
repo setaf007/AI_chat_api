@@ -1,3 +1,18 @@
+# Virtual environment
 venv/
 .env
+# Python
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+
+# Local DB
+app.db
+
+# VS Code
+.vscode/
+
+# Migrations cache
+alembic/__pycache__/
