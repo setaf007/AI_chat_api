@@ -8,9 +8,20 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 security = HTTPBearer()
 
+def get_db() -> Generator[Session, None, None]:
+    """
+    Dependency that provides a database session.
+    Yields a SQLAlchemy Session and ensures it's closed after use.
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 def get_current_user(
         credentials: HTTPAuthorizationCredentials = Depends(security),
-        db: Session = Depends(SessionLocal),
+        db: Session = Depends(get_db),
 ) -> models.User:
     """Extract user from JWT token"""
     token_data = auth.verify_token(credentials.credentials)
@@ -28,14 +39,3 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
-
-def get_db() -> Generator[Session, None, None]:
-    """
-    Dependency that provides a database session.
-    Yields a SQLAlchemy Session and ensures it's closed after use.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()

@@ -1,12 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
 
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 from app.core.config import settings
-from app.routers import users
+from app.routers import users, chats
+from app.limiter import limiter
 
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -23,9 +29,16 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.add_exception_handler(
+        RateLimitExceeded,
+        lambda e,
+        _: HTTPException(429, detail="Rate limit exceeded"),
+    )
+    app.state.limiter = limiter
+
     # Include routers
     app.include_router(users.router)
-    # app.include_router(chats.router, prefix="/chats", tags=["chats"])
+    app.include_router(chats.router)
 
     @app.get("/health", tags=["health"])
     async def health_check(db: Session = Depends(get_db)):
