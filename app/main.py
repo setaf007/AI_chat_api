@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends
 
 from app.core.config import settings
-# from app.routers import users, chats
+from app.routers import users
 
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
@@ -23,8 +23,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Include routers later
-    # app.include_router(users.router, prefix="/users", tags=["users"])
+    # Include routers
+    app.include_router(users.router)
     # app.include_router(chats.router, prefix="/chats", tags=["chats"])
 
     @app.get("/health", tags=["health"])
