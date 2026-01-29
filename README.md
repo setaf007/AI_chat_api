@@ -13,6 +13,9 @@ FastAPI backend with LM Studio (local LLM). User auth, chat history, rate limiti
 1. **Clone & setup**
 ```bash
 pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
-
+2. **LM setup**
+Currently tested using local LLM through LMstudio.
+In order to use other API, code can be edited.
